@@ -13,7 +13,7 @@ const exec = (p: string) =>
 const serviceRunning = async (serviceName: string): Promise<true | string> => {
 	const { stdout, stderr } = await exec(`sc query ${serviceName}`).catch((stderr) => ({ stderr, stdout: '' }));
 	if (stderr !== '') return stderr;
-	if (stdout.toString().indexOf(`RUNNING`) > -1) return stdout;
+	if (!stdout.includes(`RUNNING`)) return stdout;
 	return true;
 };
 const startService = async (serviceName: string) => exec(`net start ${serviceName}`).catch(() => {});
@@ -26,14 +26,18 @@ const startService = async (serviceName: string) => exec(`net start ${serviceNam
 export const checkService = async (serviceName: string) => {
 	await log(`\nChecking service ${serviceName} is running...\n`);
 	let serviceStatus = await serviceRunning(serviceName);
+
+	if (serviceStatus === true) return true;
+
+	await WARN(`Service ${serviceName} reported: \n${serviceStatus}\nAttempting to restart...`);
+	await startService(serviceName);
+	serviceStatus = await serviceRunning(serviceName);
+
 	if (serviceStatus !== true) {
-		await WARN(`Service ${serviceName} reported: \n${serviceStatus}\nAttempting to restart...`);
-		await startService(serviceName);
-		serviceStatus = await serviceRunning(serviceName);
-		if (serviceStatus !== true) {
-			await ERROR(`[ref 2.1] Service ${serviceName} is not running! Failed to automatically restart! Service reported: \n${serviceStatus}\n`);
-		} else await WARN(`Service ${serviceName} restarted successfully!`);
-		return true;
+		await ERROR(`[ref 2.1] Service ${serviceName} is not running! Failed to automatically restart! Service reported: \n${serviceStatus}\n`);
+		return false;
 	}
-	return false;
+
+	await WARN(`Service ${serviceName} restarted successfully!`);
+	return true;
 };

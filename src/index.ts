@@ -60,9 +60,8 @@ const checkStatus = async () => {
 			await ERROR(`[ref 3.2] Backup USB not connected!`);
 			await ERROR(backupIssues);
 		}
+		await continu();
 	}
-
-	await continu();
 	process.exit(0);
 };
 checkStatus().catch(async (err) => {
