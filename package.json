@@ -1,5 +1,15 @@
 {
-  "dependencies": {
-    "@types/node": "^18.6.3"
-  }
+	"dependencies": {
+		"@inrixia/db": "^1.8.0",
+		"@types/node": "^18.7.14",
+		"pkg": "^5.8.0"
+	},
+	"scripts": {
+		"prep": "npm install && npm run build",
+		"prestart": "tsc",
+		"build": "tsc && pkg ./dist/index.js --out-path=./build -t latest-linux,latest-mac,latest-win --compress GZip",
+		"buildLinux": "tsc && pkg ./dist/index.js --out-path=./build -t latest-linux",
+		"buildMac": "tsc && pkg ./dist/index.js --out-path=./build -t latest-mac",
+		"buildWin": "tsc && pkg ./dist/index.js --out-path=./build -t latest-win"
+	}
 }
