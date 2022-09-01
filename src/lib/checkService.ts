@@ -1,6 +1,6 @@
 import { exec as _exec } from 'child_process';
 import { promisify } from 'util';
-import { WARN, ERROR, log } from './helpers';
+import { WARN, ERROR, log, GREEN } from './helpers';
 
 const exec = (p: string) =>
 	new Promise<{ stdout: string; stderr: string }>((res, rej) =>
@@ -24,12 +24,15 @@ const startService = async (serviceName: string) => exec(`net start ${serviceNam
  * @returns true if the service is running, false if its not
  */
 export const checkService = async (serviceName: string) => {
-	await log(`\nChecking service ${serviceName} is running...\n`);
+	await log(`Checking service ${serviceName} is running... `);
 	let serviceStatus = await serviceRunning(serviceName);
 
-	if (serviceStatus === true) return true;
+	if (serviceStatus === true) {
+		await GREEN(`RUNNING!\n`);
+		return true;
+	}
 
-	await WARN(`Service ${serviceName} reported: \n${serviceStatus}\nAttempting to restart...`);
+	await WARN(`\nService ${serviceName} reported: \n${serviceStatus}\nAttempting to restart...`);
 	await startService(serviceName);
 	serviceStatus = await serviceRunning(serviceName);
 

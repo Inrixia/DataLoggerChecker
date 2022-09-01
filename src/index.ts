@@ -21,11 +21,12 @@ const config = db<Config>('./config.json', {
 });
 
 const checkStatus = async () => {
-	const serviceStatuss = await Promise.all(config.serviceNames.map((service) => checkService(service)));
+	const serviceStatuss = [];
+	for (const service of config.serviceNames) serviceStatuss.push(await checkService(service));
 
 	if (serviceStatuss.some((status) => status === false)) {
-		await ERROR(`Issues were found. Record the issue and refer to the Trial Instructions if service did not restart\n\n`);
-	} else await GREEN('No issues found... All services working normally.\n\n');
+		await ERROR(`Issues were found. Record the issue(s) above and refer to the Trial Instructions if a service did not restart\n\n`);
+	} else await GREEN('All services running.\n\n');
 
 	await continu();
 
