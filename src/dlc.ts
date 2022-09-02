@@ -33,8 +33,8 @@ const checkStatus = async () => {
 	for (const com of config.comPorts) await checkCom(com);
 
 	if (config.backupDir !== '') {
-		await log(`Backups exist in ${config.backupDir}\n`);
-		const backupIssues = `Issues were found. Record the issue and refer to the Trial Instructions.\n\n`;
+		await log(`Checking if backups exist in ${config.backupDir}\n`);
+		const backupIssues = `Issues were found. Record the issue and refer to the Trial Instructions.\n`;
 		try {
 			const latestBackup = (await readdir(config.backupDir)).slice(1).reduce((latest, backup) => {
 				// 2020.11.30-00.43.25
@@ -56,7 +56,7 @@ const checkStatus = async () => {
 			if (latestBackup > _24Hours) {
 				await ERROR(`[ref 3.1] A backup has not occurred in the last 24 hours!`);
 				await ERROR(backupIssues);
-			} else await GREEN('No issues found... Backups working normally.\n\n');
+			} else await GREEN('No issues found... Backups working normally.\n');
 		} catch (err) {
 			await ERROR(`[ref 3.2] Backup USB not connected!`);
 			await ERROR(backupIssues);
@@ -66,7 +66,7 @@ const checkStatus = async () => {
 	process.exit(0);
 };
 checkStatus().catch(async (err) => {
-	await ERROR(`The following error was encountered during operation: ${err} \n\n`);
+	await ERROR(`The following error was encountered during operation: ${err} \n`);
 	await continu();
 	process.exit(0);
 });

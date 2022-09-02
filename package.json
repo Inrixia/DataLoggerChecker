@@ -7,9 +7,9 @@
 	"scripts": {
 		"prep": "npm install && npm run build",
 		"prestart": "tsc",
-		"build": "tsc && pkg ./dist/index.js --out-path=./build -t latest-linux,latest-mac,latest-win --compress GZip",
-		"buildLinux": "tsc && pkg ./dist/index.js --out-path=./build -t latest-linux",
-		"buildMac": "tsc && pkg ./dist/index.js --out-path=./build -t latest-mac",
-		"buildWin": "tsc && pkg ./dist/index.js --out-path=./build -t latest-win"
+		"build": "tsc && pkg ./dist/dlc.js --out-path=./build -t latest-linux,latest-mac,latest-win --compress GZip",
+		"buildLinux": "tsc && pkg ./dist/dlc.js --out-path=./build -t latest-linux",
+		"buildMac": "tsc && pkg ./dist/dlc.js --out-path=./build -t latest-mac",
+		"buildWin": "tsc && pkg ./dist/dlc.js --out-path=./build -t latest-win"
 	}
 }
