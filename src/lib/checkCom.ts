@@ -8,7 +8,7 @@ export const checkCom = async (com: string) => {
 	const file = dateFormat(new Date(), `C:\\DataLog\\_${com}\\data%Y%m%d%H.log`);
 	try {
 		const COM = await stat(file);
-		const timeOld = COM.mtime.getTime() - Date.now();
+		const timeOld = Date.now() - COM.mtime.getTime();
 		if (timeOld > 1 * 60 * 1000) {
 			await ERROR(`[ref 1.1] ${com} datalog file has not been updated in the last minute.`);
 			await ERROR(comIssue);
