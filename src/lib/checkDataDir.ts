@@ -15,7 +15,7 @@ export const checkDir = async (baseDataDir: string, dir: string) => {
 			})
 		);
 		const latestFiles = fileTimes.filter(({ modTime }) => modTime < 1 * 60 * 1000);
-		if (latestFiles.length === undefined) {
+		if (latestFiles.length === 0) {
 			await ERROR(`[ref 1.1] No files in ${dir} have been updated in the last minute.`);
 			await ERROR(dirIssue);
 		} else {
