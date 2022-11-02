@@ -24,31 +24,3 @@ export const continu = async () => {
 	await keypress();
 	console.clear();
 };
-
-export const dateFormat = (date: Date, fstr: string) => {
-	return fstr.replace(/%[YmdHMS]/g, (m: string) => {
-		switch (m) {
-			case '%Y':
-				return date.getUTCFullYear().toString(); // no leading zeros required
-			case '%m':
-				m = (1 + date.getUTCMonth()).toString();
-				break;
-			case '%d':
-				m = date.getUTCDate().toString();
-				break;
-			case '%H':
-				m = date.getUTCHours().toString();
-				break;
-			case '%M':
-				m = date.getUTCMinutes().toString();
-				break;
-			case '%S':
-				m = date.getUTCSeconds().toString();
-				break;
-			default:
-				throw new Error('Invalid format specifier');
-		}
-		// add leading zero if required
-		return ('0' + m).slice(-2);
-	});
-};
