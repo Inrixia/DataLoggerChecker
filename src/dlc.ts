@@ -1,18 +1,20 @@
-import { readdir } from 'fs/promises';
 import db from '@inrixia/db';
 
-import { checkCom } from './lib/checkCom';
-import { ERROR, log, GREEN, continu } from './lib/helpers';
-import { checkService } from './lib/checkService';
+import { ERROR, GREEN, continu } from './lib/helpers.js';
+import { checkService } from './lib/checkService.js';
+import { checkBackups } from './lib/checkBackup.js';
+import { checkDir } from './lib/checkDataDir.js';
 
 type Config = {
-	comPorts: string[];
+	baseDataDir: string;
+	dataDirs: string[];
 	serviceNames: string[];
 	backupDir: string;
 };
 const config = db<Config>('./config.json', {
 	template: {
-		comPorts: [],
+		baseDataDir: 'C:\\DataLog',
+		dataDirs: [],
 		serviceNames: ['Tardis', 'AdvNMEADataLogger'],
 		backupDir: '',
 	},
@@ -21,48 +23,19 @@ const config = db<Config>('./config.json', {
 });
 
 const checkStatus = async () => {
-	const serviceStatuss = [];
-	for (const service of config.serviceNames) serviceStatuss.push(await checkService(service));
+	if (config.baseDataDir === '') throw new Error(`config.baseDataDir must be specified!`);
+	const serviceStatus = [];
+	for (const service of config.serviceNames) serviceStatus.push(await checkService(service));
 
-	if (serviceStatuss.some((status) => status === false)) {
+	if (serviceStatus.some((status) => status === false)) {
 		await ERROR(`Issues were found. Record the issue(s) above and refer to the Trial Instructions if a service did not restart\n\n`);
 	} else await GREEN('All services running.\n\n');
 
 	await continu();
 
-	for (const com of config.comPorts) await checkCom(com);
+	for (const dir of config.dataDirs) await checkDir(config.baseDataDir, dir);
 
-	if (config.backupDir !== '') {
-		await log(`Checking if backups exist in ${config.backupDir}\n`);
-		const backupIssues = `Issues were found. Record the issue and refer to the Trial Instructions.\n`;
-		try {
-			const latestBackup = (await readdir(config.backupDir)).slice(1).reduce((latest, backup) => {
-				// 2020.11.30-00.43.25
-				backup = backup.slice(16);
-				const year = +backup.slice(0, 4);
-				const month = +backup.slice(5, 7) - 1;
-				const day = +backup.slice(8, 10);
-
-				const hour = +backup.slice(11, 13);
-				const minute = +backup.slice(14, 16);
-				const second = +backup.slice(17, 19);
-
-				const backupAge = Date.now() - new Date(year, month, day, hour, minute, second).getTime();
-				if (latest > backupAge) return backupAge;
-				return latest;
-			}, Number.MAX_SAFE_INTEGER);
-
-			const _24Hours = 24 * 60 * 60 * 1000;
-			if (latestBackup > _24Hours) {
-				await ERROR(`[ref 3.1] A backup has not occurred in the last 24 hours!`);
-				await ERROR(backupIssues);
-			} else await GREEN('No issues found... Backups working normally.\n');
-		} catch (err) {
-			await ERROR(`[ref 3.2] Backup USB not connected!`);
-			await ERROR(backupIssues);
-		}
-		await continu();
-	}
+	if (config.backupDir !== '') await checkBackups(config.backupDir);
 	process.exit(0);
 };
 checkStatus().catch(async (err) => {

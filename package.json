@@ -1,15 +1,16 @@
 {
 	"dependencies": {
-		"@inrixia/db": "^1.8.0",
-		"@types/node": "^18.7.14",
+		"@inrixia/db": "^2.0.2",
+		"@types/node": "^18.11.9",
 		"pkg": "^5.8.0"
 	},
+	"type": "module",
 	"scripts": {
 		"prep": "npm install && npm run build",
 		"prestart": "tsc",
-		"build": "tsc && pkg ./dist/dlc.js --out-path=./build -t latest-linux,latest-mac,latest-win --compress GZip",
-		"buildLinux": "tsc && pkg ./dist/dlc.js --out-path=./build -t latest-linux",
-		"buildMac": "tsc && pkg ./dist/dlc.js --out-path=./build -t latest-mac",
-		"buildWin": "tsc && pkg ./dist/dlc.js --out-path=./build -t latest-win"
+		"build": "esbuild ./src/dlc.ts --bundle --platform=node --outfile=dist/dlc.cjs && pkg ./dist/dlc.cjs --out-path=./build -t latest-linux,latest-mac,latest-win --compress GZip"
+	},
+	"devDependencies": {
+		"esbuild": "^0.15.12"
 	}
 }

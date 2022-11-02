@@ -1,6 +1,5 @@
 import { exec as _exec } from 'child_process';
-import { promisify } from 'util';
-import { WARN, ERROR, log, GREEN } from './helpers';
+import { WARN, ERROR, log, GREEN } from './helpers.js';
 
 const exec = (p: string) =>
 	new Promise<{ stdout: string; stderr: string }>((res, rej) =>
