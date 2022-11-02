@@ -1,5 +1,5 @@
 import { stat, readFile, readdir } from 'fs/promises';
-import { dateFormat, continu } from './helpers.js';
+import { continu } from './helpers.js';
 import { log, ERROR, GREEN } from './helpers.js';
 
 export const checkDir = async (baseDataDir: string, dir: string) => {
@@ -8,16 +8,18 @@ export const checkDir = async (baseDataDir: string, dir: string) => {
 	const dirPath = `${baseDataDir}\\${dir}`;
 	try {
 		const files = await readdir(dirPath);
-		const latestFile = files.filter(async (file) => {
-			const fileStats = await stat(file);
-			const fileAge = Date.now() - fileStats.mtime.getTime();
-			return fileAge > 1 * 60 * 1000;
-		})[0];
-		if (latestFile.length === undefined) {
+		const fileTimes = await Promise.all(
+			files.map(async (file) => {
+				const fileStats = await stat(`${dirPath}\\${file}`);
+				return { file, modTime: Date.now() - fileStats.mtime.getTime() };
+			})
+		);
+		const latestFiles = fileTimes.filter(({ modTime }) => modTime < 1 * 60 * 1000);
+		if (latestFiles.length === undefined) {
 			await ERROR(`[ref 1.1] No files in ${dir} have been updated in the last minute.`);
 			await ERROR(dirIssue);
 		} else {
-			const fileData = (await readFile(`${baseDataDir}\\${dir}\\${latestFile}`)).toString().split('\n');
+			const fileData = (await readFile(`${baseDataDir}\\${dir}\\${latestFiles[0].file}`)).toString().split('\n');
 			const fileString = fileData
 				.slice(fileData.length - 20, fileData.length)
 				.join('\n')
