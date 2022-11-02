@@ -23,7 +23,7 @@ export const checkDir = async (baseDataDir: string, dir: string) => {
 			const fileString = fileData
 				.slice(fileData.length - 20, fileData.length)
 				.join('\n')
-				.slice(1000);
+				.slice(0, 1000);
 			await GREEN(
 				`No issues found with ${dir}. Here is the latest data, please check if sensible data is being logged.\nRefer to Trial Instructions (Annex A) for examples: \n\n`
 			);
