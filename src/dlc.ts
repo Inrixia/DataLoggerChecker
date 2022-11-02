@@ -43,3 +43,13 @@ checkStatus().catch(async (err) => {
 	await continu();
 	process.exit(0);
 });
+
+process
+	.on('unhandledRejection', (reason) => {
+		console.error(reason, 'Unhandled Promise rejection!');
+		process.exit(1);
+	})
+	.on('uncaughtException', (err) => {
+		console.error(err, 'Uncaught Exception thrown!');
+		process.exit(1);
+	});
