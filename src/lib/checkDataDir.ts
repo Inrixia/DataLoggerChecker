@@ -1,6 +1,6 @@
-import { stat, readFile, readdir } from 'fs/promises';
-import { continu } from './helpers.js';
-import { log, ERROR, GREEN } from './helpers.js';
+import { stat, readFile, readdir } from "fs/promises";
+import { continu } from "./helpers.js";
+import { log, ERROR, GREEN } from "./helpers.js";
 
 export const checkDir = async (baseDataDir: string, dir: string) => {
 	const dirIssue = `Issues were found with ${dir}. Record the issue and refer to the Trial Instructions.\n`;
@@ -19,11 +19,12 @@ export const checkDir = async (baseDataDir: string, dir: string) => {
 			await ERROR(`[ref 1.1] No files in ${dir} have been updated in the last minute.`);
 			await ERROR(dirIssue);
 		} else {
-			const fileData = (await readFile(`${baseDataDir}\\${dir}\\${latestFiles[0].file}`)).toString().split('\n');
+			const fileData = (await readFile(`${baseDataDir}\\${dir}\\${latestFiles[0].file}`)).toString().split("\n");
+			e;
 			const fileString = fileData
 				.slice(fileData.length - 20, fileData.length)
-				.join('\n')
-				.slice(0, 1000);
+				.join("\n")
+				.slice(-1000);
 			await GREEN(
 				`No issues found with ${dir}. Here is the latest data, please check if sensible data is being logged.\nRefer to Trial Instructions (Annex A) for examples: \n\n`
 			);
